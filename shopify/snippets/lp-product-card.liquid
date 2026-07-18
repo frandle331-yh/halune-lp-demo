@@ -1,0 +1,24 @@
+{% comment %}
+  関連商品カード(snippet)
+  params: product, attrs(optional)
+{% endcomment %}
+<div class="lp-rcard" {{ attrs }}>
+  <a class="lp-rcard__visual" href="{{ product.url }}">
+    {{ product.featured_image | image_url: width: 480 | image_tag:
+        loading: 'lazy',
+        widths: '240, 480',
+        sizes: '(max-width: 820px) 90vw, 320px',
+        alt: product.featured_image.alt | default: product.title }}
+  </a>
+  <div class="lp-rcard__body">
+    {%- if product.type != blank -%}<p class="lp-rcard__cat">{{ product.type }}</p>{%- endif -%}
+    <h3>{{ product.title }}</h3>
+    <p class="lp-rcard__price">
+      {{ product.price | money }} <small>(税込)</small>
+      {%- if product.compare_at_price > product.price -%}
+        <s>{{ product.compare_at_price | money }}</s>
+      {%- endif -%}
+    </p>
+    <a class="lp-rcard__btn" href="{{ product.url }}">商品を見る</a>
+  </div>
+</div>
