@@ -1,0 +1,40 @@
+{
+  "sections": {
+    "hero": {
+      "type": "lp-hero",
+      "blocks": {
+        "badge1": { "type": "badge", "settings": { "label": "合成香料フリー" } },
+        "badge2": { "type": "badge", "settings": { "label": "パラベンフリー" } },
+        "badge3": { "type": "badge", "settings": { "label": "アルコールフリー" } },
+        "badge4": { "type": "badge", "settings": { "label": "国内製造" } }
+      },
+      "block_order": ["badge1", "badge2", "badge3", "badge4"],
+      "settings": {
+        "eyebrow": "導入美容液 ─ MOIST GLOW SERUM",
+        "title": "洗顔後すぐの一滴が、その先のうるおいを変える。",
+        "cta_label": "今すぐセール価格で試す"
+      }
+    },
+    "price": {
+      "type": "lp-price",
+      "blocks": {
+        "perk1": { "type": "perk", "settings": { "label": "全国送料無料" } },
+        "perk2": { "type": "perk", "settings": { "label": "30日間返金保証" } },
+        "perk3": { "type": "perk", "settings": { "label": "翌営業日発送" } }
+      },
+      "block_order": ["perk1", "perk2", "perk3"],
+      "settings": {
+        "ribbon": "SUMMER SALE",
+        "cta_label": "セール価格でカートに入れる"
+      }
+    },
+    "related": {
+      "type": "lp-related",
+      "settings": {
+        "title": "あわせて使いたい関連商品",
+        "limit": 3
+      }
+    }
+  },
+  "order": ["hero", "price", "related"]
+}
