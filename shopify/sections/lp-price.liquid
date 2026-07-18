@@ -1,0 +1,115 @@
+{% comment %}
+  LP用 セール価格表示セクション
+  - 商品の compare_at_price と price から割引率を自動計算
+  - AJAX(Cart API)でカート追加し、カートドロワー/カートページへ誘導
+{% endcomment %}
+
+{%- assign product = section.settings.product -%}
+{%- assign variant = product.selected_or_first_available_variant -%}
+
+<section class="lp-price" id="buy">
+  <div class="lp-inner">
+    <div class="lp-price__card">
+      {%- if section.settings.ribbon != blank -%}
+        <div class="lp-price__ribbon">{{ section.settings.ribbon }}</div>
+      {%- endif -%}
+
+      {%- if product != blank -%}
+        <p class="lp-price__label">{{ product.title }}</p>
+        <div class="lp-price__row">
+          {%- if variant.compare_at_price > variant.price -%}
+            <span class="lp-price__old">通常価格 {{ variant.compare_at_price | money }}</span>
+            <span class="lp-price__now">{{ variant.price | money }}<small>(税込)</small></span>
+            {%- assign off = variant.compare_at_price | minus: variant.price | times: 100 | divided_by: variant.compare_at_price -%}
+            <span class="lp-price__off">{{ off }}%OFF</span>
+          {%- else -%}
+            <span class="lp-price__now">{{ variant.price | money }}<small>(税込)</small></span>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.subtext != blank -%}
+          <p class="lp-price__tax">{{ section.settings.subtext }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.deadline != blank -%}
+          <div class="lp-countdown" data-deadline="{{ section.settings.deadline }}">
+            <div class="lp-countdown__unit"><div class="lp-countdown__num" data-cd="d">--</div><div class="lp-countdown__lab">DAYS</div></div>
+            <div class="lp-countdown__unit"><div class="lp-countdown__num" data-cd="h">--</div><div class="lp-countdown__lab">HOURS</div></div>
+            <div class="lp-countdown__unit"><div class="lp-countdown__num" data-cd="m">--</div><div class="lp-countdown__lab">MIN</div></div>
+            <div class="lp-countdown__unit"><div class="lp-countdown__num" data-cd="s">--</div><div class="lp-countdown__lab">SEC</div></div>
+          </div>
+        {%- endif -%}
+
+        {%- form 'product', product, class: 'lp-price__form' -%}
+          <input type="hidden" name="id" value="{{ variant.id }}">
+          <input type="hidden" name="quantity" value="1">
+          <button type="submit" class="lp-btn-primary" {% unless variant.available %}disabled{% endunless %}>
+            {%- if variant.available -%}
+              {{ section.settings.cta_label | default: 'カートに入れる' }}<span class="arrow">→</span>
+            {%- else -%}
+              在庫切れ
+            {%- endif -%}
+          </button>
+        {%- endform -%}
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="lp-price__perks">
+          {%- for block in section.blocks -%}
+            <span {{ block.shopify_attributes }}>
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 10l5 5 9-11"/></svg>
+              {{ block.settings.label }}
+            </span>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var wrap = document.querySelector('#buy .lp-countdown');
+    if (!wrap) return;
+    var end = new Date(wrap.dataset.deadline);
+    if (isNaN(end)) return;
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    function tick() {
+      var diff = Math.max(0, end - new Date());
+      var d = Math.floor(diff / 864e5); diff %= 864e5;
+      var h = Math.floor(diff / 36e5);  diff %= 36e5;
+      var m = Math.floor(diff / 6e4);   diff %= 6e4;
+      var s = Math.floor(diff / 1e3);
+      wrap.querySelector('[data-cd="d"]').textContent = pad(d);
+      wrap.querySelector('[data-cd="h"]').textContent = pad(h);
+      wrap.querySelector('[data-cd="m"]').textContent = pad(m);
+      wrap.querySelector('[data-cd="s"]').textContent = pad(s);
+    }
+    tick(); setInterval(tick, 1000);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "LP:セール価格",
+  "tag": "section",
+  "settings": [
+    { "type": "product", "id": "product", "label": "販売商品" },
+    { "type": "text", "id": "ribbon", "label": "リボン文言", "default": "SUMMER SALE" },
+    { "type": "text", "id": "subtext", "label": "価格下の補足", "default": "送料無料 / 1本あたり約33日分" },
+    { "type": "text", "id": "deadline", "label": "セール締切(例: 2026-07-31T23:59:59+09:00)", "info": "空欄でカウントダウン非表示" },
+    { "type": "text", "id": "cta_label", "label": "CTAボタンのラベル", "default": "セール価格でカートに入れる" }
+  ],
+  "blocks": [
+    {
+      "type": "perk",
+      "name": "特典表示",
+      "settings": [
+        { "type": "text", "id": "label", "label": "ラベル", "default": "全国送料無料" }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [{ "name": "LP:セール価格" }]
+}
+{% endschema %}

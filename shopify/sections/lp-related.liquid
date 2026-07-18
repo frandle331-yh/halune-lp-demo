@@ -1,0 +1,52 @@
+{% comment %}
+  LP用 関連商品セクション
+  - コレクション指定 or ブロックで個別商品指定の両対応
+{% endcomment %}
+
+<section class="lp-related" id="related">
+  <div class="lp-inner">
+    <div class="lp-sec-head">
+      {%- if section.settings.eyebrow != blank -%}<p class="lp-sec-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h2 class="lp-sec-title">{{ section.settings.title }}</h2>
+    </div>
+
+    <div class="lp-related__grid">
+      {%- if section.blocks.size > 0 -%}
+        {%- for block in section.blocks -%}
+          {%- assign p = block.settings.product -%}
+          {%- if p != blank -%}
+            {% render 'lp-product-card', product: p, attrs: block.shopify_attributes %}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- elsif section.settings.collection != blank -%}
+        {%- for p in section.settings.collection.products limit: section.settings.limit -%}
+          {% render 'lp-product-card', product: p %}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "LP:関連商品",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "英字小見出し", "default": "Recommended" },
+    { "type": "text", "id": "title", "label": "見出し", "default": "あわせて使いたい関連商品" },
+    { "type": "collection", "id": "collection", "label": "コレクション(ブロック未指定時に使用)" },
+    { "type": "range", "id": "limit", "label": "表示数", "min": 2, "max": 8, "step": 1, "default": 3 }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "商品",
+      "settings": [
+        { "type": "product", "id": "product", "label": "商品" }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [{ "name": "LP:関連商品" }]
+}
+{% endschema %}
